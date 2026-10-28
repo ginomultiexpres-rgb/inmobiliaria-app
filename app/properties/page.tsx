@@ -1,66 +1,102 @@
 "use client"
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { PropertyCard } from "@/components/property-card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { supabase } from "@/lib/supabase"
 
 export default function PropertiesPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
-  const [properties, setProperties] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const propertyTypes = ["Departamento", "Casa", "Oficina", "Terreno"];
+  const [properties, setProperties] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchProperties = async () => {
-      setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("properties")
-          .select("*")
-          .order("created_at", { ascending: false });
-        if (error) console.error("Error fetching properties:", error);
-        setProperties(data || []);
+        const { data, error } = await supabase.from("properties").select("*").order("created_at", { ascending: false })
+        if (error) console.error(error)
+        setProperties(data || [])
       } catch (err) {
-        console.error("Exception fetching properties:", err);
-        setProperties([]);
+        console.error(err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchProperties();
-  }, []);
+    }
+    fetchProperties()
+  }, [])
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <main className="max-w-7xl mx-auto p-8">
-        <h1 className="text-4xl font-bold mb-8 text-zinc-900">Propiedades</h1>
+    <div className="min-h-screen bg-gradient-to-b from-blue-600 to-yellow-50 via-yellow-100 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Hero Section */}
+        <section className="hero-section pb-12 mb-12 rounded-2xl shadow-lg">
+          <div className="px-8 py-12 text-center">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
+              Explora Nuestras Propiedades
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Descubre más de 1,000 propiedades únicas para comprar, alquilar o invertir en
+            </p>
+          </div>
+        </section>
 
-        <Input
-          placeholder="Buscar propiedades..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="mb-6 max-w-md"
-        />
+        {/* Search and Filters */}
+        <section className="mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-8">
+            <div className="w-full sm:w-64 relative">
+              <input
+                type="text"
+                placeholder="Buscar propiedades..."
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="cursor-pointer">Todas</Badge>
+              <Badge variant="default" className="cursor-pointer">Casa</Badge>
+              <Badge variant="default" className="cursor-pointer">Apartamento</Badge>
+              <Badge variant="default" className="cursor-pointer">Terreno</Badge>
+              <Badge variant="default" className="cursor-pointer">Luxuriossa</Badge>
+            </div>
+          </div>
+        </section>
 
-        <div className="mb-6 flex flex-wrap gap-3">
-          <Button variant="outline" onClick={() => setSearchTerm("")}>Volver</Button>
-          <Button variant="outline" onClick={() => setSelectedType("")}>Mostrar Todo</Button>
-          <Button variant="outline" onClick={() => setPriceRange({ min: "", max: "" })}>Filtro Precio</Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {properties.map((property: any) => (
-            <PropertyCard key={property.id} id={property.id} title={property.title} location={property.location} price={property.price} type={property.type} images={property.images} />
-          ))}
-        </div>
+        {/* Properties Grid */}
+        <section>
+          <div className="grid-responsive gap-6">
+            {loading ? (
+              <div className="min-h-60 flex items-center justify-center col-span-full">
+                <div className="loading-spinner" />
+                <span className="ml-4 text-muted-foreground">Cargando propiedades...</span>
+              </div>
+            ) : (
+              <div>
+                {(properties || []).map((property: any) => (
+                  <Card key={property.id} className="property-card hover:shadow-xl transition-shadow cursor-pointer">
+                    <CardHeader>
+                      <Image
+                        src={property.image_url || property.images?.[0]}
+                        alt={property.title}
+                        width={500}
+                        height={350}
+                        className="rounded-lg w-full h-48 object-cover mb-4"
+                      />
+                      <CardTitle>{property.title}</CardTitle>
+                      <Badge variant="secondary">{property.type}</Badge>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-2">{property.location}</p>
+                      <p className="text-xl font-bold mt-2">{property.price}</p>
+                      <Button className="mt-4 w-full">Ver Detalle →</Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
       </main>
     </div>
-  );
+  )
 }

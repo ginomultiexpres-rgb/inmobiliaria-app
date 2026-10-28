@@ -1,16 +1,35 @@
-import { cn } from "@/lib/utils";
+import * as React from "react"
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
-
-export function Input({ className, type = "text", ...props }: InputProps) {
-  return (
-    <input
-      className={cn(
-        "flex h-10 w-full rounded-md border border-input placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground transition-colors",
-        className
-      )}
-      type={type}
-      {...props}
-    />
-  );
+interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
+  variant?: "default" | "outline" | "secondary"
+  size?: "default" | "sm" | "lg"
 }
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, variant = "default", size = "default", ...props }, ref) => {
+    const variantStyles = {
+      default: "",
+      outline: "border-2 border-input/50 focus:border-primary",
+      secondary: "bg-secondary/20 border-secondary/20",
+    }
+
+    const sizeStyles = {
+      default: "",
+      sm: "rounded-md",
+      lg: "rounded-lg",
+    }
+
+    const customClasses = `
+      flex h-10 w-full rounded-md border border-input bg-background p-2 pr-12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+      placeholder:[--placeholder]:color-muted-foreground
+      ${variantStyles[variant]}
+      ${sizeStyles[size]}
+    `.trim()
+
+    return <input ref={ref} className={customClasses} {...props} />
+  },
+)
+
+Input.displayName = "Input"
+
+export { Input }

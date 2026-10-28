@@ -1,0 +1,25 @@
+/* Tailwind CSS imports */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom InmoCore styles */
+:root {
+  --color-primary: #1e3a5f;
+  --color-accent: #f5a623;
+  --color-background: #ffffff;
+  --color-text: #1f2937;
+  --color-muted: #6b7280;
+  --color-muted-foreground: #6b7280;
+  --color-card-bg: #ffffff;
+  --color-card-bg-dark: #1f2937;
+  --color-header-bg: linear-gradient(135deg, #1e3a5f, #2d5a87);
+}
+
+/* Tailwind utilities */
+.hero-bg { background: linear-gradient(135deg, #1e3a5f, #2d5a87); }
+.property-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+.gradient-text { background: linear-gradient(135deg, #1e3a5f, #2d5a87); -webkit-background-clip: text; }
+.grid-responsive { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.loading-spinner { border: 3px solid #f3f3f3; border-top: 3px solid #1e3a5f; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
